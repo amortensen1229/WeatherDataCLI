@@ -1,10 +1,18 @@
 {
-  "name": "weatherdata",
-  "version": "1.0.0",
+  "name": "myweatherdata",
+  "version": "1.0.1",
   "description": "A weather data CLI tool.",
-  "main": "app.js",
+  "main": "bin/app.js",
+  "bin": {
+    "wd": "./bin/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amortensen1229/WeatherDataCLI.git"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "author": "Adam Mortensen",
   "license": "MIT",
