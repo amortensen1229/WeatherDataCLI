@@ -14,6 +14,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
   },
+  "keywords": ["weather", "myweather", "cli", "zipcode", "weather-cli"],
+  "bugs" :{
+    "url": "https://github.com/amortensen1229/WeatherDataCLI/issues"
+  },
   "author": "Adam Mortensen",
   "license": "MIT",
   "dependencies": {
