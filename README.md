@@ -1,7 +1,7 @@
 # MyWeatherData ⛈⛈
 
 
-## Discription: 
+## Description: 
 MyWeatherData is a command-line interface designed to give the user quick and easy access to accurate weather forecasting.
 
 MyWeatherData works through zip codes. Upon installation, the default zip code is set to 10001. 

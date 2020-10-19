@@ -1,7 +1,7 @@
 {
   "name": "myweatherdata",
-  "version": "1.0.9",
-  "description": "A weather data CLI tool.",
+  "version": "1.1.1",
+  "description": "A weather data CLI tool. Weather forcast by zip code.",
   "main": "bin/app.js",
   "bin": {
     "mwd": "./bin/app.js"
