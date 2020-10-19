@@ -1,31 +1,68 @@
 #!/usr/bin/env node
 
-
-//Require Statements:
+// Require Statements:
+// Modules:
+//==========================================
 const chalk = require('chalk');
 const axios = require('axios');
 const zip = require('zipcodes');
-const config = require('./config.json');
-const env = require('./env.json')
+const fs = require('fs');
 const { program } = require('commander');
 program.version('0.0.1');
+const Configstore = require('configstore');
+const packageJson = require('../package.json');
+//==========================================
 
-program.option('-z, --zip <input_zip>', 'enter non-default zip');
+// Local Files:
+//==========================================
+const apiKey = require('./ApiKey.json');
+const Settings = require('./Settings.js');
+//==========================================
+
+
+
+program.option('-z, --zip <input_zip>', 'Enter non-default zip.');
+program.option('-sz, --setzip <input_default_zip>', 'Enter desired default zip (persistant).');
+program.option('-st, --settheme <input_theme_hex>', 'Enter hex code to set default theme color (ommit "#").');
 program.parse(process.argv);
 
-var my_zip;
-if (program.zip) {
-  my_zip = zip.lookup(program.zip);
-  get_data();
-} else {
-  my_zip = zip.lookup(env.zipCode);
-  get_data();
+const config = new Configstore(packageJson.name);
+
+// Setting Default Values in Config:
+if (!(config.has('ThemeColor') && config.has('ZipCode'))) {
+  config.set('ZipCode', '10001');
+  config.set('ThemeColor', '61DBFB');
 }
 
-function get_data() {
-  axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${my_zip.latitude}&lon=${my_zip.longitude}&exclude=hourly,minutely&appid=${config.apiKey}&units=imperial`)
+var my_zip;
+my_zip = zip.lookup(config.get('ZipCode'));
+
+// Checking if setting ZipCode:
+if (program.setzip) {
+  Settings.SetZipCode(program.setzip, config);
+  console.log(`SUCCESS: Set Default Zip to ${config.get('ZipCode')}. ✅ ✅`);
+  return 1;
+}
+
+// Checking if setting Theme:
+if (program.settheme) {
+  Settings.SetTheme(program.settheme, config);
+  console.log(`SUCCESS: Set Theme to #${config.get('ThemeColor')}. ✅ ✅`);
+  return 1;
+}
+
+// Checking if input ZipCode:
+if (program.zip) {
+  my_zip = zip.lookup(program.zip);
+} 
+
+CallApi();
+
+// Make API call and draw onto terminall
+function CallApi() {
+  axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${my_zip.latitude}&lon=${my_zip.longitude}&exclude=hourly,minutely&appid=${apiKey.apiKey}&units=imperial`)
   .then(function (response) {
-    draw(response.data);
+    Draw(response.data);
   })
   .catch(function (error) {
     console.log("Encountered Error: " + error);
@@ -34,16 +71,13 @@ function get_data() {
 }
 
 
-function draw(data) {
+function Draw(data) {
   let breaker_lines = "==========================================================================================================";
   var date1 = new Date(data.daily[0].dt * 1000);
   var date2 = new Date(data.daily[1].dt * 1000);
   var date3 = new Date(data.daily[2].dt * 1000);
 
-  console.log("\n\n\n");
-  console.log(chalk.hex(env.themeColor)(breaker_lines));
-  console.log(chalk.hex(env.themeColor)(breaker_lines));
-
+  // Logic to determine middle of lines:
   let location = my_zip.city + ", " + my_zip.state;
   let title_line = "";
   for (let i = 0; i < (breaker_lines.length / 2 ) - 11; ++i) {
@@ -57,10 +91,9 @@ function draw(data) {
   }
   location_line += location;
   let time_line = "";
-  console.log();
-  console.log(chalk.hex(env.themeColor)(title_line));
-  console.log(chalk.hex(env.themeColor)(location_line));
-  console.log();
+
+  
+  // Formatting data strings:
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < (breaker_lines.length / 3) - 17; ++j) {
       time_line += " ";
@@ -75,6 +108,8 @@ function draw(data) {
       time_line += date3.toLocaleDateString();
     }
   }
+
+  // Formatting content strings:
   let line_zero = "";
   line_zero += `||           ${date1.toLocaleDateString()}`.padEnd(34);
   line_zero += `||           ${date2.toLocaleDateString()}`.padEnd(34);
@@ -99,13 +134,25 @@ function draw(data) {
   line_three += `||   Temperature Low: ${data.daily[2].temp.min}`.padEnd(34);
   line_three += "||"
 
-  //Writing to command line:
+  // Writing to command line:
+  console.log("\n\n\n");
+
+  console.log(chalk.hex(config.get('ThemeColor'))(breaker_lines));
+  console.log(chalk.hex(config.get('ThemeColor'))(breaker_lines));
+
+  console.log();
+  console.log(chalk.hex(config.get('ThemeColor'))(title_line));
+  console.log(chalk.hex(config.get('ThemeColor'))(location_line));
+  console.log();
+
   console.log(line_zero);
   console.log(line_one);
   console.log(line_two);
   console.log(line_three);
   console.log();
-  console.log(chalk.hex(env.themeColor)(breaker_lines));
-  console.log(chalk.hex(env.themeColor)(breaker_lines));
+
+  console.log(chalk.hex(config.get('ThemeColor'))(breaker_lines));
+  console.log(chalk.hex(config.get('ThemeColor'))(breaker_lines));
+
   console.log("\n\n\n");
 }

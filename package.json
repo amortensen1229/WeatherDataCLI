@@ -1,10 +1,10 @@
 {
   "name": "myweatherdata",
-  "version": "1.0.1",
+  "version": "1.0.9",
   "description": "A weather data CLI tool.",
   "main": "bin/app.js",
   "bin": {
-    "wd": "./bin/app.js"
+    "mwd": "./bin/app.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
     "axios": "^0.20.0",
     "chalk": "^4.1.0",
     "commander": "^6.1.0",
+    "configstore": "^5.0.1",
     "zipcodes": "^8.0.0"
   }
 }
